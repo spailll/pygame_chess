@@ -67,7 +67,14 @@ class Board:
         for move in piece.allowed_moves:
             if piece.type == 'pawn':
                 if piece.color == 'white':
-                    if move[0] == piece2.x + 60 or move[0] == piece2.x - 60:
+                    if move[0] == piece.x + 60:
+                        tag = False
+                        for piece2 in self.black_pieces:
+                            if piece2.x == move[0] and piece2.y == move[1]:
+                                tag = True
+                        if tag == False:
+                            piece.allowed_moves.remove(move)
+                    if move[0] == piece.x - 60:
                         tag = False
                         for piece2 in self.black_pieces:
                             if piece2.x == move[0] and piece2.y == move[1]:
@@ -75,7 +82,14 @@ class Board:
                         if tag == False:
                             piece.allowed_moves.remove(move)
                 else:
-                    if move[0] == piece2.x + 60 or move[0] == piece2.x - 60:
+                    if move[0] == piece.x + 60:
+                        tag = False
+                        for piece2 in self.white_pieces:
+                            if piece2.x == move[0] and piece2.y == move[1]:
+                                tag = True
+                        if tag == False:
+                            piece.allowed_moves.remove(move)
+                    if move[0] == piece.x - 60:
                         tag = False
                         for piece2 in self.white_pieces:
                             if piece2.x == move[0] and piece2.y == move[1]:
