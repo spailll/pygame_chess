@@ -36,11 +36,11 @@ class Board:
             self.find_allowed_moves(piece2)
         for move in piece.allowed_moves:
             if x == move[0] and y == move[1]:
+                piece.selected = False
                 piece.x = x
                 piece.y = y
                 piece.rect = pygame.Rect(piece.x, piece.y, PIECE_SIZE, PIECE_SIZE)
                 piece.has_moved = True
-                piece.selected = False
                 if piece.color == 'black':
                     for piece2 in self.white_pieces:
                         if piece2.x == x and piece2.y == y:
@@ -58,11 +58,11 @@ class Board:
             if piece.color == 'white':
                 for piece2 in self.white_pieces:
                     if move == (piece2.x, piece2.y):
-                        piece.allowed_moves.remove(move) 
+                        piece.remove_moves.append(move) 
             else:
                 for piece2 in self.black_pieces:
                     if move == (piece2.x, piece2.y):
-                        piece.allowed_moves.remove(move)
+                        piece.remove_moves.append(move)
             # specific piece checks
         for move in piece.allowed_moves:
             if piece.type == 'pawn':
@@ -70,44 +70,172 @@ class Board:
                     if move[0] == piece.x + 60:
                         tag = False
                         for piece2 in self.black_pieces:
-                            if piece2.x == move[0] and piece2.y == move[1]:
+                            if move == (piece2.x, piece2.y):
                                 tag = True
                         if tag == False:
-                            piece.allowed_moves.remove(move)
-                    if move[0] == piece.x - 60:
+                            piece.remove_moves.append(move)
+                    elif move[0] == piece.x - 60:
                         tag = False
                         for piece2 in self.black_pieces:
-                            if piece2.x == move[0] and piece2.y == move[1]:
+                            if move == (piece2.x, piece2.y):
                                 tag = True
                         if tag == False:
-                            piece.allowed_moves.remove(move)
+                            piece.remove_moves.append(move)
+                    elif move == (piece.x, piece.y-60):
+                        for piece2 in self.black_pieces:
+                            if move == (piece2.x, piece2.y):
+                                piece.remove_moves.append(move)
+                    elif move == (piece.x, piece.y-120):
+                        removed = False
+                        for piece2 in self.black_pieces:
+                            if move == (piece2.x, piece2.y):
+                                piece.remove_moves.append(move)
+                                removed = True
+                            elif move == (piece2.x, piece2.y-60):
+                                piece.remove_moves.append(move)
+                                removed = True
+                        if not removed:
+                            for piece2 in self.white_pieces:
+                                if move == (piece2.x, piece2.y-60):
+                                    piece.remove_moves.append(move)
                 else:
                     if move[0] == piece.x + 60:
                         tag = False
                         for piece2 in self.white_pieces:
-                            if piece2.x == move[0] and piece2.y == move[1]:
+                            if move == (piece2.x, piece2.y):
                                 tag = True
                         if tag == False:
-                            piece.allowed_moves.remove(move)
-                    if move[0] == piece.x - 60:
+                            piece.remove_moves.append(move)
+                    elif move[0] == piece.x - 60:
                         tag = False
                         for piece2 in self.white_pieces:
-                            if piece2.x == move[0] and piece2.y == move[1]:
+                            if move == (piece2.x, piece2.y):
                                 tag = True
                         if tag == False:
-                            piece.allowed_moves.remove(move)
+                            piece.remove_moves.append(move)
+                    elif move == (piece.x, piece.y+60):
+                        for piece2 in self.white_pieces:
+                            if move == (piece2.x, piece2.y):
+                                piece.remove_moves.append(move)
+                    elif move == (piece.x, piece.y+120):
+                        removed = False
+                        for piece2 in self.white_pieces:
+                            if move == (piece2.x, piece2.y):
+                                piece.remove_moves.append(move)
+                                removed = True
+                            elif move == (piece2.x, piece2.y+60):
+                                piece.remove_moves.append(move)
+                                removed = True
+                        if not removed:
+                            for piece2 in self.black_pieces:
+                                if move == (piece2.x, piece2.y+60):
+                                    piece.remove_moves.append(move)
+            # if piece.type == 'bishop' or piece.type == 'queen':
 
-            ##if piece.type == 'bishop' or piece.type == 'queen':
-
-            # if piece.type == 'rook' or piece.type == 'queen' or piece.type == 'pawn':
-            #     if move[1] > piece.y + 60:
-            #         for i in range(piece.y, move[1], 60):
-            #             for piece2 in self.white_pieces:
-            #                 if piece2.x == move[0] and piece2.y == i:
-            #                     piece.allowed_moves.remove(move)
-            #             for piece2 in self.black_pieces:
-            #                 if piece2.x == move[0] and piece2.y == i:
-            #                     piece.allowed_moves.remove(move)
+            if piece.type == 'rook' or piece.type == 'queen':
+                removed = False
+                if move[1] > piece.y + 60:
+                    removed = False
+                    for i in range(piece.y+60, move[1], 60):
+                        for piece2 in self.white_pieces:
+                            if (piece.x,i) == (piece2.x, piece2.y):
+                                if move == (piece2.x, piece2.y):
+                                    if piece2.color == piece.color:
+                                        piece.remove_moves.append(move)
+                                        break
+                                else:
+                                    piece.remove_moves.append(move)
+                                    
+                                    break
+                        else:
+                            for piece2 in self.black_pieces:
+                                if (piece.x,i) == (piece2.x, piece2.y):
+                                    if move == (piece2.x, piece2.y):
+                                        if piece2.color == piece.color:
+                                            piece.remove_moves.append(move)
+                                            break
+                                    else:
+                                        piece.remove_moves.append(move)
+                                        break
+                            else:
+                                continue
+                        break
+                elif move[1] < piece.y - 60:
+                    for i in range(move[1], piece.y, 60):
+                        for piece2 in self.white_pieces:
+                            if (piece.x,i) == (piece2.x, piece2.y):
+                                if move == (piece2.x, piece2.y):
+                                    if piece2.color == piece.color:
+                                        piece.remove_moves.append(move)
+                                        break
+                                else:
+                                    piece.remove_moves.append(move)
+                                    break
+                        else:
+                            for piece2 in self.black_pieces:
+                                if (piece.x,i) == (piece2.x, piece2.y):
+                                    if move == (piece2.x, piece2.y):
+                                        if piece2.color == piece.color:
+                                            piece.remove_moves.append(move)
+                                            break
+                                    else:
+                                        piece.remove_moves.append(move)
+                                        break
+                            else:
+                                continue
+                        break
+                elif move[0] > piece.x + 60:
+                    removed = False
+                    for i in range(piece.x+60, move[0], 60):
+                        for piece2 in self.white_pieces:
+                            if (i,piece.y) == (piece2.x, piece2.y):
+                                if move == (piece2.x, piece2.y):
+                                    if piece2.color == piece.color:
+                                        piece.remove_moves.append(move)
+                                        break
+                                else:
+                                    piece.remove_moves.append(move)
+                                    break
+                        else:
+                            for piece2 in self.black_pieces:
+                                if (i,piece.y) == (piece2.x, piece2.y):
+                                    if move == (piece2.x, piece2.y):
+                                        if piece2.color == piece.color:
+                                            piece.remove_moves.append(move)
+                                            break
+                                    else:
+                                        piece.remove_moves.append(move)
+                                        break
+                            else:
+                                continue
+                        break        
+                elif move[0] < piece.x - 60:
+                    removed = False
+                    for i in range(move[0], piece.x, 60):
+                        for piece2 in self.white_pieces:
+                            if (i,piece.y) == (piece2.x, piece2.y):
+                                if move == (piece2.x, piece2.y):
+                                    if piece2.color == piece.color:
+                                        piece.remove_moves.append(move)
+                                        break
+                                else:
+                                    piece.remove_moves.append(move)
+                                    break
+                        else: 
+                            for piece2 in self.black_pieces:
+                                if (i,piece.y) == (piece2.x, piece2.y):
+                                    if move == (piece2.x, piece2.y):
+                                        if piece2.color == piece.color:
+                                            piece.remove_moves.append(move)
+                                            break
+                                    else:
+                                        piece.remove_moves.append(move)
+                                        break
+                            else:
+                                continue
+                        break
+                                    
+        piece.filter_moves()
         
 
 
@@ -125,12 +253,15 @@ class Pawn:
         self.rect = pygame.Rect(self.x, self.y, PIECE_SIZE, PIECE_SIZE)
         self.selected = False
         self.has_moved = False
+        self.remove_moves = []
         self.allowed_moves = []
         self.unfiltered_moves = []
         self.find_unfiltered_moves()
 
     def find_unfiltered_moves(self):
+        self.allowed_moves = []
         self.unfiltered_moves = []
+        self.remove_moves = list()
         if self.color == 'white':
             if self.has_moved == False:
                 self.unfiltered_moves.append((self.x, self.y-120))
@@ -143,6 +274,11 @@ class Pawn:
             self.unfiltered_moves.append((self.x+60, self.y+60))
             self.unfiltered_moves.append((self.x, self.y+60))
             self.unfiltered_moves.append((self.x-60, self.y+60))
+
+    def filter_moves(self):
+        remove_duplicates(self.remove_moves)
+        for move in self.remove_moves:
+            self.allowed_moves.remove(move)
 
     def draw(self, win):
         win.blit(self.image, self.rect)
@@ -162,10 +298,13 @@ class Bishop:
         self.rect = pygame.Rect(self.x, self.y, PIECE_SIZE, PIECE_SIZE)
         self.selected = False
         self.allowed_moves = []
+        self.remove_moves = []
         self.unfiltered_moves = []
         self.find_unfiltered_moves()  
 
     def find_unfiltered_moves(self):
+        self.allowed_moves = []
+        self.remove_moves = []
         self.unfiltered_moves = []
         for i in range(1,8):
             if self.x + i*60 <= 420 and self.y + i*60 <= 420:
@@ -176,6 +315,11 @@ class Bishop:
                 self.unfiltered_moves.append((self.x+i*60, self.y-i*60))
             if self.x - i*60 >= 0 and self.y - i*60 >= 0:
                 self.unfiltered_moves.append((self.x-i*60, self.y-i*60))        
+
+    def filter_moves(self):
+        remove_duplicates(self.remove_moves)
+        for move in self.remove_moves:
+            self.allowed_moves.remove(move)
 
     def draw(self, win):
         win.blit(self.image, self.rect)
@@ -195,11 +339,14 @@ class Knight:
         self.rect = pygame.Rect(self.x, self.y, PIECE_SIZE, PIECE_SIZE)
         self.selected = False
         self.allowed_moves = []
+        self.remove_moves = []
         self.unfiltered_moves = []
         self.find_unfiltered_moves()
 
     def find_unfiltered_moves(self):
+        self.allowed_moves = []
         self.unfiltered_moves = []
+        self.remove_moves = []
         for i in range(4):
             if i == 0 and self.x - 120 >= 0 and self.x - 120 <= 420:
                 if self.y - 60 >= 0 and self.y - 60 <= 420:
@@ -222,6 +369,11 @@ class Knight:
                 if self.y + 60 >= 0 and self.y + 60 <= 420:
                     self.unfiltered_moves.append((self.x+120, self.y+60))
 
+    def filter_moves(self):
+        remove_duplicates(self.remove_moves)
+        for move in self.remove_moves:
+            self.allowed_moves.remove(move)
+
     def draw(self, win):
         win.blit(self.image, self.rect)
 
@@ -241,11 +393,14 @@ class Rook:
         self.selected = False
         self.has_moved = False
         self.allowed_moves = []
+        self.remove_moves = []
         self.unfiltered_moves = []
         self.find_unfiltered_moves()
 
     def find_unfiltered_moves(self):
+        self.allowed_moves = []
         self.unfiltered_moves = []
+        self.remove_moves = []
         for i in range(1,8):
             if self.x + i*60 <= 420:
                 self.unfiltered_moves.append((self.x+i*60, self.y))
@@ -256,6 +411,10 @@ class Rook:
             if self.y - i*60 >= 0:
                 self.unfiltered_moves.append((self.x, self.y-i*60))
 
+    def filter_moves(self):
+        remove_duplicates(self.remove_moves)
+        for move in self.remove_moves:
+            self.allowed_moves.remove(move)
 
     def draw(self, win):
         win.blit(self.image, self.rect)
@@ -274,12 +433,15 @@ class Queen:
             self.image = pygame.image.load('Pieces/Chess_qdt60.png')
         self.rect = pygame.Rect(self.x, self.y, PIECE_SIZE, PIECE_SIZE)
         self.selected = False
+        self.remove_moves = []
         self.allowed_moves = []
         self.unfiltered_moves = []
         self.find_unfiltered_moves()
 
     def find_unfiltered_moves(self):
         self.unfiltered_moves = []
+        self.allowed_moves = []
+        self.remove_moves = []
         for i in range(1,8):
             if self.x + i*60 <= 420 and self.y + i*60 <= 420:
                 self.unfiltered_moves.append((self.x+i*60, self.y+i*60))
@@ -297,6 +459,11 @@ class Queen:
                 self.unfiltered_moves.append((self.x, self.y+i*60))
             if self.y - i*60 >= 0:
                 self.unfiltered_moves.append((self.x, self.y-i*60))
+
+    def filter_moves(self):
+        remove_duplicates(self.remove_moves)
+        for move in self.remove_moves:
+            self.allowed_moves.remove(move)
 
     def draw(self, win):
         win.blit(self.image, self.rect)
@@ -317,10 +484,14 @@ class King:
         self.selected = False
         self.has_moved = False
         self.allowed_moves = []
+        self.remove_moves = []
         self.unfiltered_moves = []
         self.find_unfiltered_moves()
 
     def find_unfiltered_moves(self):
+        self.allowed_moves = []
+        self.unfiltered_moves = [] 
+        self.remove_moves = []
         if self.x + 60 <= 420 and self.y + 60 <= 420:
             self.unfiltered_moves.append((self.x+60, self.y+60))
         if self.x - 60 >= 0 and self.y + 60 <= 420:
@@ -338,5 +509,16 @@ class King:
         if self.y - 60 >= 0:
             self.unfiltered_moves.append((self.x, self.y-60))
 
+
+    def filter_moves(self):
+        remove_duplicates(self.remove_moves)
+        for move in self.remove_moves:
+            self.allowed_moves.remove(move)
+            
     def draw(self, win):
         win.blit(self.image, self.rect)
+
+def remove_duplicates(set):
+    for item in set:
+        if set.count(item) > 1:
+            set.remove(item)

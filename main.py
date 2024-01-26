@@ -28,6 +28,9 @@ SQUARE_SIZE = (60,60)
 BLACK_SQUARE = pygame.Surface(SQUARE_SIZE)
 BLACK_SQUARE.fill((211,211,211))    # Light Grey
 
+BORDER_THICKNESS = 5
+BORDER_COLOR = (0,0,0)
+
 def draw_window(board):
     WIN.fill(WHITE)
 
@@ -38,8 +41,12 @@ def draw_window(board):
 
     i = 0
     for piece in board.white_pieces:
+        if piece.selected:
+            pygame.draw.rect(WIN, BORDER_COLOR, (piece.x, piece.y, PIECE_SIZE, PIECE_SIZE), BORDER_THICKNESS)
         piece.draw(WIN)
     for piece in board.black_pieces:
+        if piece.selected:
+            pygame.draw.rect(WIN, BORDER_COLOR, (piece.x, piece.y, PIECE_SIZE, PIECE_SIZE), BORDER_THICKNESS)
         piece.draw(WIN)
     pygame.display.update()
 
